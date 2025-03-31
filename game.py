@@ -63,6 +63,11 @@ class SnakeGameAI:
 
     def play_step(self, action):
         self.frame_iteration += 1
+
+        # Record old distance to food using Manhattan distance.
+        old_head = self.head
+        old_distance = abs(old_head.x - self.food.x) + abs(old_head.y - self.food.y)
+
         # 1. collect user input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,6 +93,17 @@ class SnakeGameAI:
             self._place_food()
         else:
             self.snake.pop()
+
+            # Compute new distance to food
+            new_distance = abs(self.head.x - self.food.x) + abs(self.head.y - self.food.y)
+
+            # Distance-based reward: positive if moving closer, negative if moving away
+            distance_reward = (old_distance - new_distance) * 0.1
+
+            # A small step penalty to encourage efficiency
+            step_penalty = -0.01
+
+            reward += distance_reward + step_penalty
         
         # 5. update ui and clock
         self._update_ui()
