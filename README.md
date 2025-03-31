@@ -14,6 +14,7 @@ A reinforcement learning project where an AI agent learns to play the classic Sn
 - [Installation](#installation)
 - [Usage](#usage)
 - [Project Structure](#project-structure)
+- [Credit](#credit)
 
 ---
 
@@ -47,6 +48,9 @@ Install the required packages using pip:
 ```bash
 pip install pygame torch matplotlib ipython numpy
 ```
+
+---
+
 ## Usage
 
 ### 1. Clone the Repository
@@ -58,6 +62,8 @@ git clone https://github.com/your-username/snake-game-ai.git
 cd snake-game-ai
 ```
 
+---
+
 ## Running the Game and Training
 
 To start the game and begin training the AI agent, run the main script:
@@ -65,6 +71,8 @@ To start the game and begin training the AI agent, run the main script:
 ```bash
 python agent.py
 ```
+
+---
 
 ## Project Structure
 
@@ -75,3 +83,10 @@ snake-game-ai/
 ├── agent.py         # Implements the AI agent that interacts with the game.
 ├── helper.py        # Contains helper functions, including plotting utilities.
 └── README.md        # This file.
+```
+---
+
+## Credit 
+
+@patrickloeber
+
