@@ -88,5 +88,5 @@ snake-game-ai/
 
 ## Credit 
 
-@patrickloeber
+@patrickloeber for first version code
 
