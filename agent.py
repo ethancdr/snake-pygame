@@ -19,6 +19,7 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+        self.recent_positions = deque(maxlen=10)
 
 
     def get_state(self, game):
@@ -82,21 +83,38 @@ class Agent:
         #    self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
+        reward += self.detect_loop_penalty()
         self.trainer.train_step(state, action, reward, next_state, done)
 
-    def get_action(self, state):
-        # random moves: tradeoff exploration / exploitation
+    def detect_loop_penalty(self):
+        if len(self.recent_positions) < self.recent_positions.maxlen:
+            return 0
+        current = self.recent_positions[-1]
+        if self.recent_positions.count(current) > self.recent_positions.maxlen / 2:
+            return -0.5  # Adjust the penalty as needed
+        return 0
+
+    def remember_position(self, position):
+        self.recent_positions.append(position)
+
+    def get_action(self, state, game):
         self.epsilon = 80 - self.n_games
-        final_move = [0,0,0]
+        final_move = [0, 0, 0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
-            state0 = torch.tensor(state, dtype=torch.float)
-            prediction = self.model(state0)
+            state_tensor = torch.tensor(state, dtype=torch.float)
+            prediction = self.model(state_tensor)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
 
+        # Safety check: if the move causes a collision, try alternatives.
+        if game.will_collide(final_move):
+            for alt_move in [[0, 1, 0], [0, 0, 1]]:
+                if not game.will_collide(alt_move):
+                    final_move = alt_move
+                    break
         return final_move
 
 
@@ -111,8 +129,11 @@ def train():
         # get old state
         state_old = agent.get_state(game)
 
+        # Record the current head position for loop detection
+        agent.remember_position(game.snake[0])
+
         # get move
-        final_move = agent.get_action(state_old)
+        final_move = agent.get_action(state_old, game)
 
         # perform move and get new state
         reward, done, score = game.play_step(final_move)

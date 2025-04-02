@@ -168,3 +168,28 @@ class SnakeGameAI:
             y -= BLOCK_SIZE
 
         self.head = Point(x, y)
+
+
+    def will_collide(self, action):
+        clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+        idx = clock_wise.index(self.direction)
+        if np.array_equal(action, [1, 0, 0]):
+            new_dir = clock_wise[idx]
+        elif np.array_equal(action, [0, 1, 0]):
+            new_dir = clock_wise[(idx + 1) % 4]
+        else:  # [0, 0, 1]
+            new_dir = clock_wise[(idx - 1) % 4]
+
+        x = self.head.x
+        y = self.head.y
+        if new_dir == Direction.RIGHT:
+            x += BLOCK_SIZE
+        elif new_dir == Direction.LEFT:
+            x -= BLOCK_SIZE
+        elif new_dir == Direction.DOWN:
+            y += BLOCK_SIZE
+        elif new_dir == Direction.UP:
+            y -= BLOCK_SIZE
+
+        new_head = Point(x, y)
+        return self.is_collision(new_head)
